@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html >
+<!--From https://codepen.io/frytyler/pen/EGdtg-->
+<head>
+  <meta charset="UTF-8">
+  <title>ML API</title>
+  <link href='https://fonts.googleapis.com/css?family=Pacifico' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Arimo' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Hind:300' rel='stylesheet' type='text/css'>
+<link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300' rel='stylesheet' type='text/css'>
+<link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+  
+</head>
+
+<script>
+
+imageURI = '';
+
+    function getBase64Image(img) {
+        var imageData = img[0];
+        var reader = new FileReader();
+        reader.onloadend = function () {
+            imageURI = reader.result;
+        }
+        reader.readAsDataURL(imageData);
+        return;
+    }    
+
+    function getBase64(file) {
+        return new Promise((resolve, reject) => {
+            const reader = new FileReader();
+            reader.readAsDataURL(file);
+            reader.onload = () => resolve(reader.result);
+            reader.onerror = error => reject(error);
+        });
+    }
+	
+function myFunction() {
+        $(".show-data").empty();
+        var image = document.getElementById("image").files[0];
+        getBase64(image).then(
+            imgdata => {
+                $(".show-data").append("<h2>Loading ...</h2>");
+                console.log(imgdata);
+                $.ajax({
+                    url: "/detect",
+                    type: "POST",
+                    data: {
+                        file: imgdata,
+                    }
+                }).done(function (response) {
+                    $(".show-data").empty();
+                    var html = "";
+                    response = response.result;
+                    $.each(response, function (key, val) {
+                        console.log(val);
+                        html = "<h2>" + val + "</h2>"
+                    });
+                    $(".show-data").append(html);
+                });
+            }
+        );
+    }
+
+    function resetText() {
+        console.log("reset");
+        $('#image').val('');
+        $(".show-data").empty();
+    };
+
+</script>
+
+<body>
+ <div class="login">
+	<h1>Detect the expression</h1>
+
+     <!-- Main Input For Receiving Query to our ML -->
+    <form action="{{ url_for('detect')}}"method="post">
+    	<label for="photo">Choose a photo!</label>
+
+<input 
+  type="file"
+  id="image" 
+  name="myImage"
+  accept=".jpg" onchange="readUrl(this)">
+      
+        <button type="detect" class="btn btn-primary btn-block btn-large">Detect</button>
+	    <button onclick="myFunction()">Detect</button>
+    </form>
+
+   <br>
+   <br>
+   {{ detected_expression }}
+
+ </div>
+
+
+</body>
+</html>

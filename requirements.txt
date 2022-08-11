@@ -1,0 +1,14 @@
+Flask
+gunicorn
+Werkzeug
+numpy
+matplotlib
+pandas
+Cython
+cmake
+tensorflow
+face-recognition-models
+keras
+Keras-Preprocessing
+opencv-python-headless
+jinja2
